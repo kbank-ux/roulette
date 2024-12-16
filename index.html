@@ -485,13 +485,43 @@
 			});
 		});
 
+//		window.roullete.addEventListener('goal', () => {
+//			ready = false;
+//			setTimeout(() => {
+//				document.querySelector('#settings').classList.remove('hide');
+//				document.querySelector('#donate').classList.remove('hide');
+//			}, 3000);
+//		});
+
+		let winnersCount = 0;              // 몇 명이 도착했는지 카운트
+		const totalArrivalsForRecording = 11;  
+		// "첫 우승자 포함 11명" = 첫 우승자 1명 + 추가 10명 = 총 11명 도착 때까지 녹화
+
 		window.roullete.addEventListener('goal', () => {
-			ready = false;
+		winnersCount++;
+
+		if (winnersCount === 1) {
+			// 첫 우승자
+			console.log('우승자 도착! 계속 녹화 중...');
+			// 만약 별도의 "우승자 출력" 로직 필요하면 여기에
+		}
+
+		if (winnersCount < totalArrivalsForRecording) {
+			// 아직 11명이 다 들어오지 않았으므로 녹화를 계속 진행
+			console.log(`현재 ${winnersCount}명 골인. 아직 ${totalArrivalsForRecording - winnersCount}명 남음`);
+		} else {
+			// 11번째(=첫 우승자 + 추가 10명) 도착 시점
+			console.log('총 11명 골인! 녹화 중단 & 설정창 다시 열기');
+
+			// 녹화 중단 로직이 있다면 여기서 stopRecording() 등을 호출
+			// 아래처럼 기존 3초 후에 설정창을 보여주는 방식도 동일하게 유지 가능
 			setTimeout(() => {
-				document.querySelector('#settings').classList.remove('hide');
-				document.querySelector('#donate').classList.remove('hide');
+			document.querySelector('#settings').classList.remove('hide');
+			document.querySelector('#donate').classList.remove('hide');
 			}, 3000);
+		}
 		});
+
 		window.roullete.addEventListener('shakeAvailableChanged', (e) => {
 			document.querySelector('#inGame').classList.toggle('hide', !e.detail);
 		});
