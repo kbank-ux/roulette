@@ -485,45 +485,13 @@
 			});
 		});
 
-//		window.roullete.addEventListener('goal', () => {
-//			ready = false;
-//			setTimeout(() => {
-//				document.querySelector('#settings').classList.remove('hide');
-//				document.querySelector('#donate').classList.remove('hide');
-//			}, 3000);
-//		});
-
-		let goalCount = 0;
-
-		window.roullete.addEventListener('goal', (event) => {
-		goalCount++;
-
-		if (goalCount === 1) {
-			// 첫 골인: 우승자가 결정됐을 때
-			console.log('우승자 골인');
-			// 계속 녹화를 유지, 아무나 다음 골인할 때까지 대기
-		} 
-		else if (goalCount === 5) {
-			// 두 번째 골인: 우승자 이후에 들어온 사람 (아무나)
-			console.log('5번째 골인! 녹화 중단 로직 실행');
-
-			// 예: 녹화 중단
-			if (window.roullete && window.roullete.stopRecording) {
-			window.roullete.stopRecording();
-			}
-
-			// UI 복원(설정창 보이기 등)
+		window.roullete.addEventListener('goal', () => {
+			ready = false;
 			setTimeout(() => {
-			document.querySelector('#settings').classList.remove('hide');
-			document.querySelector('#donate').classList.remove('hide');
+				document.querySelector('#settings').classList.remove('hide');
+				document.querySelector('#donate').classList.remove('hide');
 			}, 3000);
-
-			// 이후 추가 골인은 무시하고 싶다면, eventListener 해제하거나
-			// goalCount 로직으로 더 이상 동작 안 하게 해도 됨
-			// window.roullete.removeEventListener('goal', myGoalHandlerFunc);
-		}
 		});
-
 
 		window.roullete.addEventListener('shakeAvailableChanged', (e) => {
 			document.querySelector('#inGame').classList.toggle('hide', !e.detail);
