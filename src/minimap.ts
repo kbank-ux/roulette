@@ -156,17 +156,5 @@ export class Minimap implements UIObject {
       marble.render(this.ctx, 1, false, true);
     });
   }
-  // private drawMarbles(params: RenderParameters) {
-  //   const { marbles } = params;
   
-  //   // 상위 500개까지만 렌더링
-  //   const visibleMarbles = marbles.slice(0, 50);
-  
-  //   visibleMarbles.forEach((marble) => {
-  //     marble.render(this.ctx, 1, false, true);
-  //   });
-  
-  //   // 나머지 마블은 렌더링하지 않음
-  // }
-
 }
