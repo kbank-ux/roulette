@@ -729,7 +729,8 @@ class Roulette extends EventTarget {
         return this._isReady;
     }
     constructor(){
-        super(), this._marbles = [], this._lastTime = 0, this._elapsed = 0, this._noMoveDuration = 0, this._shakeAvailable = false, this._updateInterval = 10, this._timeScale = 1, this._speed = 1, this._winners = [], this._particleManager = new (0, _particleManager.ParticleManager)(), this._stage = null, this._camera = new (0, _camera.Camera)(), this._renderer = new (0, _rouletteRenderer.RouletteRenderer)(), this._effects = [], this._winnerRank = 0, this._totalMarbleCount = 0, this._goalDist = Infinity, this._isRunning = false, this._winner = null, this._uiObjects = [], this._autoRecording = false, this._isReady = false;
+        super(), this._marbles = [], this._marbleResults = [] // 타입 명시
+        , this._csvGenerated = false, this._lastTime = 0, this._elapsed = 0, this._noMoveDuration = 0, this._shakeAvailable = false, this._updateInterval = 10, this._timeScale = 1, this._speed = 1, this._winners = [], this._particleManager = new (0, _particleManager.ParticleManager)(), this._stage = null, this._camera = new (0, _camera.Camera)(), this._renderer = new (0, _rouletteRenderer.RouletteRenderer)(), this._effects = [], this._winnerRank = 0, this._totalMarbleCount = 0, this._goalDist = Infinity, this._isRunning = false, this._winner = null, this._uiObjects = [], this._autoRecording = false, this._isReady = false;
         this._renderer.init();
         this._init().then(()=>{
             this._isReady = true;
@@ -783,6 +784,10 @@ class Roulette extends EventTarget {
             }
             if (marble.y > this._stage.goalY) {
                 this._winners.push(marble);
+                this._marbleResults.push({
+                    name: marble.name,
+                    status: "\uB2F9\uCCA8"
+                }); // 도착한 공을 "당첨"으로 기록
                 if (this._isRunning && this._winners.length === this._winnerRank + 1) {
                     this.dispatchEvent(new CustomEvent('goal', {
                         detail: {
@@ -795,6 +800,17 @@ class Roulette extends EventTarget {
                     setTimeout(()=>{
                         this._recorder.stop();
                     }, 1000);
+                    // CSV 생성
+                    const remainingMarbles = this._marbles.filter((marble)=>marble.y <= this._stage.goalY) // 아직 결승점을 지나지 않은 공
+                    .sort((a, b)=>b.y - a.y) // y 값 기준으로 정렬
+                    .slice(0, 100); // 상위 100개 선택
+                    remainingMarbles.forEach((marble)=>{
+                        this._marbleResults.push({
+                            name: marble.name,
+                            status: "\uC608\uBE44"
+                        }); // 예비 공 기록
+                    });
+                    this._generateCSV();
                 } else if (this._isRunning && this._winnerRank === this._winners.length && this._winnerRank === this._totalMarbleCount - 1) {
                     this.dispatchEvent(new CustomEvent('goal', {
                         detail: {
@@ -807,17 +823,66 @@ class Roulette extends EventTarget {
                     setTimeout(()=>{
                         this._recorder.stop();
                     }, 1000);
+                    // CSV 생성
+                    const remainingMarbles = this._marbles.filter((marble)=>marble.y <= this._stage.goalY) // 아직 결승점을 지나지 않은 공
+                    .sort((a, b)=>b.y - a.y) // y 값 기준으로 정렬
+                    .slice(0, 200); // 상위 200개 선택
+                    remainingMarbles.forEach((marble)=>{
+                        this._marbleResults.push({
+                            name: marble.name,
+                            status: "\uC608\uBE44"
+                        }); // 예비 공 기록
+                    });
+                    this._generateCSV();
                 }
                 setTimeout(()=>{
                     this.physics.removeMarble(marble.id);
                 }, 500);
             }
         }
+        // 추가로 예비 공을 기록
+        if (!this._isRunning && this._marbleResults.length > 0) {
+            const remainingMarbles = this._marbles.filter((marble)=>marble.y <= this._stage.goalY) // 아직 결승점을 지나지 않은 공
+            .sort((a, b)=>b.y - a.y) // y 값 기준으로 정렬
+            .slice(0, 100); // 상위 100개 선택
+            remainingMarbles.forEach((marble)=>{
+                this._marbleResults.push({
+                    name: marble.name,
+                    status: "\uC608\uBE44"
+                }); // 예비 공 기록
+            });
+        }
         const targetIndex = this._winnerRank - this._winners.length;
         const topY = this._marbles[targetIndex] ? this._marbles[targetIndex].y : 0;
         this._goalDist = Math.abs(this._stage.zoomY - topY);
         this._timeScale = this._calcTimeScale();
         this._marbles = this._marbles.filter((marble)=>marble.y <= this._stage.goalY);
+    }
+    _generateCSV() {
+        if (this._csvGenerated) return; // 이미 CSV가 생성되었으면 중단
+        this._csvGenerated = true; // CSV 생성 플래그 설정
+        const d = new Date();
+        const pad = (num)=>String(num).padStart(2, '0');
+        const timestamp = `${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}${pad(d.getHours())}${pad(d.getMinutes())}${pad(d.getSeconds())}`;
+        // CSV 데이터 생성
+        let csvContent = "\uAD6C\uBD84,\uC774\uB984\n";
+        this._marbleResults.forEach((result)=>{
+            csvContent += `${result.status},${result.name}\n`;
+        });
+        // Blob 생성
+        const blob = new Blob([
+            `\uFEFF${csvContent}`
+        ], {
+            type: "text/csv;charset=utf-8;"
+        });
+        // 다운로드 링크 생성
+        const downloadLink = document.createElement('a');
+        downloadLink.href = URL.createObjectURL(blob);
+        downloadLink.download = `marble_roulette_${timestamp}.csv`; // 파일명에 시간 정보 포함
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+        document.body.removeChild(downloadLink);
+        console.log("CSV \uD30C\uC77C \uC0DD\uC131 \uC644\uB8CC");
     }
     _calcTimeScale() {
         if (!this._stage) return 1;
