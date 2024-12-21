@@ -130,9 +130,8 @@
 
 		#settings {
 			position: fixed;
-			left: 50%;
-			transform: translateX(-50%);
 			bottom: 1rem;
+			left: 1rem;
 			background: #666;
 			border-radius: 10px;
 			padding: 10px;
@@ -545,8 +544,6 @@
 		}, 50); // 0.05초 간격
 	}
 
-
-
 	function fadeOutOverlay(overlay) {
 		setTimeout(() => {
 			overlay.style.transition = 'opacity 1s';
@@ -757,11 +754,6 @@
 
 		window.roullete.addEventListener('goal', () => {
 			ready = false;
-
-			    // 룰렛 결과에서 당첨자와 추가 후보 가져오기
-				const winners = preSelectedNames.slice(0, MAX_SAMPLES); // 당첨자
-				const extras = preSelectedNames.slice(MAX_SAMPLES, MAX_SAMPLES + 50); // 추가 50명
-				
 			setTimeout(() => {
 				document.querySelector('#settings').classList.remove('hide');
 				//document.querySelector('#donate').classList.remove('hide');

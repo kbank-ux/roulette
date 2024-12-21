@@ -18,12 +18,14 @@ import { Box2dPhysics } from './physics-box2d';
 
 export class Roulette extends EventTarget {
   private _marbles: Marble[] = [];
+  private _marbleResults: { name: string; status: string }[] = []; // 타입 명시
+  private _csvGenerated: boolean = false;
 
   private _lastTime: number = 0;
   private _elapsed: number = 0;
   private _noMoveDuration: number = 0;
   private _shakeAvailable: boolean = false;
-
+  
   private _updateInterval = 10;
   private _timeScale = 1;
   private _speed = 1;
@@ -139,6 +141,7 @@ export class Roulette extends EventTarget {
       }
       if (marble.y > this._stage.goalY) {
         this._winners.push(marble);
+        this._marbleResults.push({ name: marble.name, status: "당첨" }); // 도착한 공을 "당첨"으로 기록
         if (this._isRunning && this._winners.length === this._winnerRank + 1) {
           this.dispatchEvent(
             new CustomEvent('goal', { detail: { winner: marble.name } }),
@@ -152,6 +155,18 @@ export class Roulette extends EventTarget {
           setTimeout(() => {
             this._recorder.stop();
           }, 1000);
+
+          // CSV 생성
+          const remainingMarbles = this._marbles
+            .filter((marble) => marble.y <= this._stage!.goalY) // 아직 결승점을 지나지 않은 공
+            .sort((a, b) => b.y - a.y) // y 값 기준으로 정렬
+            .slice(0, 100); // 상위 100개 선택
+
+          remainingMarbles.forEach((marble) => {
+              this._marbleResults.push({ name: marble.name, status: "예비" }); // 예비 공 기록
+          });
+          this._generateCSV();
+
         } else if (
           this._isRunning &&
           this._winnerRank === this._winners.length &&
@@ -171,11 +186,34 @@ export class Roulette extends EventTarget {
           setTimeout(() => {
             this._recorder.stop();
           }, 1000);
+
+          // CSV 생성
+          const remainingMarbles = this._marbles
+            .filter((marble) => marble.y <= this._stage!.goalY) // 아직 결승점을 지나지 않은 공
+            .sort((a, b) => b.y - a.y) // y 값 기준으로 정렬
+            .slice(0, 200); // 상위 200개 선택
+
+          remainingMarbles.forEach((marble) => {
+              this._marbleResults.push({ name: marble.name, status: "예비" }); // 예비 공 기록
+          });
+          this._generateCSV();
         }
         setTimeout(() => {
           this.physics.removeMarble(marble.id);
         }, 500);
       }
+    }
+
+    // 추가로 예비 공을 기록
+    if (!this._isRunning && this._marbleResults.length > 0) {
+        const remainingMarbles = this._marbles
+            .filter((marble) => marble.y <= this._stage!.goalY) // 아직 결승점을 지나지 않은 공
+            .sort((a, b) => b.y - a.y) // y 값 기준으로 정렬
+            .slice(0, 100); // 상위 100개 선택
+
+        remainingMarbles.forEach((marble) => {
+            this._marbleResults.push({ name: marble.name, status: "예비" }); // 예비 공 기록
+        });
     }
 
     const targetIndex = this._winnerRank - this._winners.length;
@@ -187,6 +225,36 @@ export class Roulette extends EventTarget {
       (marble) => marble.y <= this._stage!.goalY,
     );
   }
+
+  private _generateCSV() {
+      if (this._csvGenerated) return; // 이미 CSV가 생성되었으면 중단
+      this._csvGenerated = true; // CSV 생성 플래그 설정
+
+      const d = new Date();
+      const pad = (num: number) => String(num).padStart(2, '0');
+      const timestamp = `${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}${pad(d.getHours())}${pad(d.getMinutes())}${pad(d.getSeconds())}`;
+
+      // CSV 데이터 생성
+      let csvContent = "구분,이름\n";
+      this._marbleResults.forEach((result) => {
+          csvContent += `${result.status},${result.name}\n`;
+      });
+
+      // Blob 생성
+      const blob = new Blob([`\uFEFF${csvContent}`], { type: "text/csv;charset=utf-8;" });
+
+      // 다운로드 링크 생성
+      const downloadLink = document.createElement('a');
+      downloadLink.href = URL.createObjectURL(blob);
+      downloadLink.download = `marble_roulette_${timestamp}.csv`; // 파일명에 시간 정보 포함
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+      document.body.removeChild(downloadLink);
+
+      console.log("CSV 파일 생성 완료");
+  }
+
+
 
   private _calcTimeScale(): number {
     if (!this._stage) return 1;
