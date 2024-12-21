@@ -160,7 +160,7 @@ export class Roulette extends EventTarget {
           const remainingMarbles = this._marbles
             .filter((marble) => marble.y <= this._stage!.goalY) // 아직 결승점을 지나지 않은 공
             .sort((a, b) => b.y - a.y) // y 값 기준으로 정렬
-            .slice(0, 100); // 상위 100개 선택
+            .slice(0, 200); // 상위 200개 선택
 
           remainingMarbles.forEach((marble) => {
               this._marbleResults.push({ name: marble.name, status: "예비" }); // 예비 공 기록
@@ -204,17 +204,17 @@ export class Roulette extends EventTarget {
       }
     }
 
-    // 추가로 예비 공을 기록
-    if (!this._isRunning && this._marbleResults.length > 0) {
-        const remainingMarbles = this._marbles
-            .filter((marble) => marble.y <= this._stage!.goalY) // 아직 결승점을 지나지 않은 공
-            .sort((a, b) => b.y - a.y) // y 값 기준으로 정렬
-            .slice(0, 100); // 상위 100개 선택
+    // // 추가로 예비 공을 기록
+    // if (!this._isRunning && this._marbleResults.length > 0) {
+    //     const remainingMarbles = this._marbles
+    //         .filter((marble) => marble.y <= this._stage!.goalY) // 아직 결승점을 지나지 않은 공
+    //         .sort((a, b) => b.y - a.y) // y 값 기준으로 정렬
+    //         .slice(0, 200); // 상위 200개 선택
 
-        remainingMarbles.forEach((marble) => {
-            this._marbleResults.push({ name: marble.name, status: "예비" }); // 예비 공 기록
-        });
-    }
+    //     remainingMarbles.forEach((marble) => {
+    //         this._marbleResults.push({ name: marble.name, status: "예비" }); // 예비 공 기록
+    //     });
+    // }
 
     const targetIndex = this._winnerRank - this._winners.length;
     const topY = this._marbles[targetIndex] ? this._marbles[targetIndex].y : 0;
