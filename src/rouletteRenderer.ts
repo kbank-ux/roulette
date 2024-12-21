@@ -175,6 +175,29 @@ export class RouletteRenderer {
     });
   }
 
+  // private renderMarbles({
+  //   marbles,
+  //   camera,
+  //   winnerRank,
+  //   winners,
+  // }: RenderParameters) {
+  //   const winnerIndex = winnerRank - winners.length;
+  
+  //   // 상위 500개만 렌더링
+  //   const visibleMarbles = marbles.slice(0, 50);
+  
+  //   visibleMarbles.forEach((marble, i) => {
+  //     marble.render(
+  //       this.ctx,
+  //       camera.zoom * initialZoom,
+  //       i === winnerIndex,
+  //       false,
+  //     );
+  //   });
+  // }
+  
+
+  
   private renderWinner({ winner }: RenderParameters) {
     if (!winner) return;
     this.ctx.save();

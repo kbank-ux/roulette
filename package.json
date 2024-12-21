@@ -21,7 +21,7 @@
   },
   "scripts": {
     "lint": "eslint --fix src/**/*.ts",
-    "dev": "parcel index.html",
+    "dev": "yarn build && parcel index.html",
     "build": "parcel build index.html --public-url /roulette/",
     "deploy": "yarn build && gh-pages -d dist"
   },
