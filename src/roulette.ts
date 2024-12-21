@@ -165,7 +165,9 @@ export class Roulette extends EventTarget {
           remainingMarbles.forEach((marble) => {
               this._marbleResults.push({ name: marble.name, status: "예비" }); // 예비 공 기록
           });
-          this._generateCSV();
+          if (this._autoRecording) {
+            this._generateCSV(); // 녹화가 켜져 있을 경우에만 CSV 생성
+          }
 
         } else if (
           this._isRunning &&
@@ -196,7 +198,9 @@ export class Roulette extends EventTarget {
           remainingMarbles.forEach((marble) => {
               this._marbleResults.push({ name: marble.name, status: "예비" }); // 예비 공 기록
           });
-          this._generateCSV();
+          if (this._autoRecording) {
+            this._generateCSV(); // 녹화가 켜져 있을 경우에만 CSV 생성
+          }
         }
         setTimeout(() => {
           this.physics.removeMarble(marble.id);
@@ -227,32 +231,33 @@ export class Roulette extends EventTarget {
   }
 
   private _generateCSV() {
-      if (this._csvGenerated) return; // 이미 CSV가 생성되었으면 중단
-      this._csvGenerated = true; // CSV 생성 플래그 설정
+    if (this._csvGenerated || !this._autoRecording) return; // 이미 CSV 생성되었거나 녹화가 꺼져 있으면 중단
+    this._csvGenerated = true; // CSV 생성 플래그 설정
 
-      const d = new Date();
-      const pad = (num: number) => String(num).padStart(2, '0');
-      const timestamp = `${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}${pad(d.getHours())}${pad(d.getMinutes())}${pad(d.getSeconds())}`;
+    const d = new Date();
+    const pad = (num: number) => String(num).padStart(2, '0');
+    const timestamp = `${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}${pad(d.getHours())}${pad(d.getMinutes())}${pad(d.getSeconds())}`;
 
-      // CSV 데이터 생성
-      let csvContent = "구분,이름\n";
-      this._marbleResults.forEach((result) => {
-          csvContent += `${result.status},${result.name}\n`;
-      });
+    // CSV 데이터 생성
+    let csvContent = "구분,이름\n";
+    this._marbleResults.forEach((result) => {
+        csvContent += `${result.status},${result.name}\n`;
+    });
 
-      // Blob 생성
-      const blob = new Blob([`\uFEFF${csvContent}`], { type: "text/csv;charset=utf-8;" });
+    // Blob 생성
+    const blob = new Blob([`\uFEFF${csvContent}`], { type: "text/csv;charset=utf-8;" });
 
-      // 다운로드 링크 생성
-      const downloadLink = document.createElement('a');
-      downloadLink.href = URL.createObjectURL(blob);
-      downloadLink.download = `marble_roulette_${timestamp}.csv`; // 파일명에 시간 정보 포함
-      document.body.appendChild(downloadLink);
-      downloadLink.click();
-      document.body.removeChild(downloadLink);
+    // 다운로드 링크 생성
+    const downloadLink = document.createElement('a');
+    downloadLink.href = URL.createObjectURL(blob);
+    downloadLink.download = `marble_roulette_${timestamp}.csv`; // 파일명에 시간 정보 포함
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    document.body.removeChild(downloadLink);
 
-      console.log("CSV 파일 생성 완료");
+    console.log("CSV 파일 생성 완료");
   }
+
 
 
 
