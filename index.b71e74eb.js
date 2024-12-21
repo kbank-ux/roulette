@@ -4562,6 +4562,24 @@ class RouletteRenderer {
             marble.render(this.ctx, camera.zoom * (0, _constants.initialZoom), i === winnerIndex, false);
         });
     }
+    // private renderMarbles({
+    //   marbles,
+    //   camera,
+    //   winnerRank,
+    //   winners,
+    // }: RenderParameters) {
+    //   const winnerIndex = winnerRank - winners.length;
+    //   // 상위 500개만 렌더링
+    //   const visibleMarbles = marbles.slice(0, 50);
+    //   visibleMarbles.forEach((marble, i) => {
+    //     marble.render(
+    //       this.ctx,
+    //       camera.zoom * initialZoom,
+    //       i === winnerIndex,
+    //       false,
+    //     );
+    //   });
+    // }
     renderWinner({ winner }) {
         if (!winner) return;
         this.ctx.save();
