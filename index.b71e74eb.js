@@ -803,14 +803,14 @@ class Roulette extends EventTarget {
                     // CSV 생성
                     const remainingMarbles = this._marbles.filter((marble)=>marble.y <= this._stage.goalY) // 아직 결승점을 지나지 않은 공
                     .sort((a, b)=>b.y - a.y) // y 값 기준으로 정렬
-                    .slice(0, 100); // 상위 100개 선택
+                    .slice(0, 200); // 상위 200개 선택
                     remainingMarbles.forEach((marble)=>{
                         this._marbleResults.push({
                             name: marble.name,
                             status: "\uC608\uBE44"
                         }); // 예비 공 기록
                     });
-                    this._generateCSV();
+                    if (this._autoRecording) this._generateCSV(); // 녹화가 켜져 있을 경우에만 CSV 생성
                 } else if (this._isRunning && this._winnerRank === this._winners.length && this._winnerRank === this._totalMarbleCount - 1) {
                     this.dispatchEvent(new CustomEvent('goal', {
                         detail: {
@@ -833,25 +833,23 @@ class Roulette extends EventTarget {
                             status: "\uC608\uBE44"
                         }); // 예비 공 기록
                     });
-                    this._generateCSV();
+                    if (this._autoRecording) this._generateCSV(); // 녹화가 켜져 있을 경우에만 CSV 생성
                 }
                 setTimeout(()=>{
                     this.physics.removeMarble(marble.id);
                 }, 500);
             }
         }
-        // 추가로 예비 공을 기록
-        if (!this._isRunning && this._marbleResults.length > 0) {
-            const remainingMarbles = this._marbles.filter((marble)=>marble.y <= this._stage.goalY) // 아직 결승점을 지나지 않은 공
-            .sort((a, b)=>b.y - a.y) // y 값 기준으로 정렬
-            .slice(0, 100); // 상위 100개 선택
-            remainingMarbles.forEach((marble)=>{
-                this._marbleResults.push({
-                    name: marble.name,
-                    status: "\uC608\uBE44"
-                }); // 예비 공 기록
-            });
-        }
+        // // 추가로 예비 공을 기록
+        // if (!this._isRunning && this._marbleResults.length > 0) {
+        //     const remainingMarbles = this._marbles
+        //         .filter((marble) => marble.y <= this._stage!.goalY) // 아직 결승점을 지나지 않은 공
+        //         .sort((a, b) => b.y - a.y) // y 값 기준으로 정렬
+        //         .slice(0, 200); // 상위 200개 선택
+        //     remainingMarbles.forEach((marble) => {
+        //         this._marbleResults.push({ name: marble.name, status: "예비" }); // 예비 공 기록
+        //     });
+        // }
         const targetIndex = this._winnerRank - this._winners.length;
         const topY = this._marbles[targetIndex] ? this._marbles[targetIndex].y : 0;
         this._goalDist = Math.abs(this._stage.zoomY - topY);
@@ -859,7 +857,7 @@ class Roulette extends EventTarget {
         this._marbles = this._marbles.filter((marble)=>marble.y <= this._stage.goalY);
     }
     _generateCSV() {
-        if (this._csvGenerated) return; // 이미 CSV가 생성되었으면 중단
+        if (this._csvGenerated || !this._autoRecording) return; // 이미 CSV 생성되었거나 녹화가 꺼져 있으면 중단
         this._csvGenerated = true; // CSV 생성 플래그 설정
         const d = new Date();
         const pad = (num)=>String(num).padStart(2, '0');
@@ -4412,6 +4410,1017 @@ const stages = [
                 }
             }
         ]
+    },
+    {
+        title: 'Custom',
+        goalY: 111,
+        zoomY: 106.75,
+        walls: [
+            [
+                [
+                    16.5,
+                    -300
+                ],
+                [
+                    9.25,
+                    -300
+                ],
+                [
+                    9.25,
+                    8.5
+                ],
+                [
+                    2,
+                    19.25
+                ],
+                [
+                    2,
+                    26
+                ],
+                [
+                    9.75,
+                    30
+                ],
+                [
+                    9.75,
+                    33.5
+                ],
+                [
+                    1.25,
+                    41
+                ],
+                [
+                    1.25,
+                    53.75
+                ],
+                [
+                    8.25,
+                    58.75
+                ],
+                [
+                    8.25,
+                    63
+                ],
+                [
+                    9.25,
+                    64
+                ],
+                [
+                    8.25,
+                    65
+                ],
+                [
+                    8.25,
+                    99.25
+                ],
+                [
+                    15.1,
+                    106.75
+                ],
+                [
+                    15.1,
+                    111.75
+                ]
+            ],
+            [
+                [
+                    16.5,
+                    -300
+                ],
+                [
+                    16.5,
+                    9.25
+                ],
+                [
+                    9.5,
+                    20
+                ],
+                [
+                    9.5,
+                    22.5
+                ],
+                [
+                    17.5,
+                    26
+                ],
+                [
+                    17.5,
+                    33.5
+                ],
+                [
+                    24,
+                    38.5
+                ],
+                [
+                    19,
+                    45.5
+                ],
+                [
+                    19,
+                    55.5
+                ],
+                [
+                    24,
+                    59.25
+                ],
+                [
+                    24,
+                    63
+                ],
+                [
+                    23,
+                    64
+                ],
+                [
+                    24,
+                    65
+                ],
+                [
+                    24,
+                    100.5
+                ],
+                [
+                    16,
+                    106.75
+                ],
+                [
+                    16,
+                    111.75
+                ]
+            ],
+            [
+                [
+                    12.75,
+                    37.5
+                ],
+                [
+                    7,
+                    43.5
+                ],
+                [
+                    7,
+                    49.75
+                ],
+                [
+                    12.75,
+                    53.75
+                ],
+                [
+                    12.75,
+                    37.5
+                ]
+            ],
+            [
+                [
+                    14.75,
+                    37.5
+                ],
+                [
+                    14.75,
+                    43
+                ],
+                [
+                    17.5,
+                    40.25
+                ],
+                [
+                    14.75,
+                    37.5
+                ]
+            ]
+        ],
+        entities: [
+            // boxes
+            {
+                position: {
+                    x: 15.5,
+                    y: 30.0
+                },
+                shape: {
+                    type: 'box',
+                    width: 0.2,
+                    height: 0.2,
+                    rotation: -45
+                },
+                type: 'static',
+                props: {
+                    density: 1,
+                    angularVelocity: 0,
+                    restitution: 1
+                }
+            },
+            {
+                position: {
+                    x: 15.5,
+                    y: 32
+                },
+                type: 'static',
+                shape: {
+                    type: 'box',
+                    width: 0.2,
+                    height: 0.2,
+                    rotation: -45
+                },
+                props: {
+                    density: 1,
+                    angularVelocity: 0,
+                    restitution: 0
+                }
+            },
+            {
+                position: {
+                    x: 15.5,
+                    y: 28
+                },
+                type: 'static',
+                shape: {
+                    type: 'box',
+                    width: 0.2,
+                    height: 0.2,
+                    rotation: -45
+                },
+                props: {
+                    density: 1,
+                    angularVelocity: 0,
+                    restitution: 0
+                }
+            },
+            {
+                position: {
+                    x: 12.5,
+                    y: 30
+                },
+                type: 'static',
+                shape: {
+                    type: 'box',
+                    width: 0.2,
+                    height: 0.2,
+                    rotation: -45
+                },
+                props: {
+                    density: 1,
+                    angularVelocity: 0,
+                    restitution: 0
+                }
+            },
+            {
+                position: {
+                    x: 12.5,
+                    y: 32
+                },
+                type: 'static',
+                shape: {
+                    type: 'box',
+                    width: 0.2,
+                    height: 0.2,
+                    rotation: -45
+                },
+                props: {
+                    density: 1,
+                    angularVelocity: 0,
+                    restitution: 0
+                }
+            },
+            {
+                position: {
+                    x: 12.5,
+                    y: 28
+                },
+                type: 'static',
+                shape: {
+                    type: 'box',
+                    width: 0.2,
+                    height: 0.2,
+                    rotation: -45
+                },
+                props: {
+                    density: 1,
+                    angularVelocity: 0,
+                    restitution: 0
+                }
+            },
+            {
+                position: {
+                    x: 9.4,
+                    y: 66.6
+                },
+                type: 'static',
+                shape: {
+                    type: 'box',
+                    width: 0.6,
+                    height: 0.1,
+                    rotation: 45
+                },
+                props: {
+                    density: 1,
+                    angularVelocity: 0,
+                    restitution: 0
+                }
+            },
+            {
+                position: {
+                    x: 11.3,
+                    y: 66.6
+                },
+                type: 'static',
+                shape: {
+                    type: 'box',
+                    width: 0.6,
+                    height: 0.1,
+                    rotation: 45
+                },
+                props: {
+                    density: 1,
+                    angularVelocity: 0,
+                    restitution: 0
+                }
+            },
+            {
+                position: {
+                    x: 13.2,
+                    y: 66.6
+                },
+                type: 'static',
+                shape: {
+                    type: 'box',
+                    width: 0.6,
+                    height: 0.1,
+                    rotation: 45
+                },
+                props: {
+                    density: 1,
+                    angularVelocity: 0,
+                    restitution: 0
+                }
+            },
+            {
+                position: {
+                    x: 15.1,
+                    y: 66.6
+                },
+                type: 'static',
+                shape: {
+                    type: 'box',
+                    width: 0.6,
+                    height: 0.1,
+                    rotation: 45
+                },
+                props: {
+                    density: 1,
+                    angularVelocity: 0,
+                    restitution: 0
+                }
+            },
+            {
+                position: {
+                    x: 17,
+                    y: 66.6
+                },
+                type: 'static',
+                shape: {
+                    type: 'box',
+                    width: 0.6,
+                    height: 0.1,
+                    rotation: 45
+                },
+                props: {
+                    density: 1,
+                    angularVelocity: 0,
+                    restitution: 0
+                }
+            },
+            {
+                position: {
+                    x: 18.9,
+                    y: 66.6
+                },
+                type: 'static',
+                shape: {
+                    type: 'box',
+                    width: 0.6,
+                    height: 0.1,
+                    rotation: 45
+                },
+                props: {
+                    density: 1,
+                    angularVelocity: 0,
+                    restitution: 0
+                }
+            },
+            {
+                position: {
+                    x: 20.699999999999996,
+                    y: 66.6
+                },
+                type: 'static',
+                shape: {
+                    type: 'box',
+                    width: 0.6,
+                    height: 0.1,
+                    rotation: 45
+                },
+                props: {
+                    density: 1,
+                    angularVelocity: 0,
+                    restitution: 0
+                }
+            },
+            {
+                position: {
+                    x: 22.7,
+                    y: 66.6
+                },
+                type: 'static',
+                shape: {
+                    type: 'box',
+                    width: 0.6,
+                    height: 0.1,
+                    rotation: 45
+                },
+                props: {
+                    density: 1,
+                    angularVelocity: 0,
+                    restitution: 0
+                }
+            },
+            {
+                position: {
+                    x: 9.4,
+                    y: 69.1
+                },
+                type: 'static',
+                shape: {
+                    type: 'box',
+                    width: 0.6,
+                    height: 0.1,
+                    rotation: -45
+                },
+                props: {
+                    density: 1,
+                    angularVelocity: 0,
+                    restitution: 0
+                }
+            },
+            {
+                position: {
+                    x: 11.3,
+                    y: 69.1
+                },
+                type: 'static',
+                shape: {
+                    type: 'box',
+                    width: 0.6,
+                    height: 0.1,
+                    rotation: -45
+                },
+                props: {
+                    density: 1,
+                    angularVelocity: 0,
+                    restitution: 0
+                }
+            },
+            {
+                position: {
+                    x: 13.2,
+                    y: 69.1
+                },
+                type: 'static',
+                shape: {
+                    type: 'box',
+                    width: 0.6,
+                    height: 0.1,
+                    rotation: -45
+                },
+                props: {
+                    density: 1,
+                    angularVelocity: 0,
+                    restitution: 0
+                }
+            },
+            {
+                position: {
+                    x: 15.1,
+                    y: 69.1
+                },
+                type: 'static',
+                shape: {
+                    type: 'box',
+                    width: 0.6,
+                    height: 0.1,
+                    rotation: -45
+                },
+                props: {
+                    density: 1,
+                    angularVelocity: 0,
+                    restitution: 0
+                }
+            },
+            {
+                position: {
+                    x: 17,
+                    y: 69.1
+                },
+                type: 'static',
+                shape: {
+                    type: 'box',
+                    width: 0.6,
+                    height: 0.1,
+                    rotation: -45
+                },
+                props: {
+                    density: 1,
+                    angularVelocity: 0,
+                    restitution: 0
+                }
+            },
+            {
+                position: {
+                    x: 18.9,
+                    y: 69.1
+                },
+                type: 'static',
+                shape: {
+                    type: 'box',
+                    width: 0.6,
+                    height: 0.1,
+                    rotation: -45
+                },
+                props: {
+                    density: 1,
+                    angularVelocity: 0,
+                    restitution: 0
+                }
+            },
+            {
+                position: {
+                    x: 20.699999999999996,
+                    y: 69.1
+                },
+                type: 'static',
+                shape: {
+                    type: 'box',
+                    width: 0.6,
+                    height: 0.1,
+                    rotation: -45
+                },
+                props: {
+                    density: 1,
+                    angularVelocity: 0,
+                    restitution: 0
+                }
+            },
+            {
+                position: {
+                    x: 22.7,
+                    y: 69.1
+                },
+                type: 'static',
+                shape: {
+                    type: 'box',
+                    width: 0.6,
+                    height: 0.1,
+                    rotation: -45
+                },
+                props: {
+                    density: 1,
+                    angularVelocity: 0,
+                    restitution: 0
+                }
+            },
+            {
+                position: {
+                    x: 9.5,
+                    y: 92
+                },
+                type: 'static',
+                shape: {
+                    type: 'box',
+                    width: 0.25,
+                    height: 0.25,
+                    rotation: 0.7853981633974483
+                },
+                props: {
+                    density: 1,
+                    angularVelocity: 0,
+                    restitution: 0
+                }
+            },
+            {
+                position: {
+                    x: 12.75,
+                    y: 92
+                },
+                type: 'static',
+                shape: {
+                    type: 'box',
+                    width: 0.25,
+                    height: 0.25,
+                    rotation: 0.7853981633974483
+                },
+                props: {
+                    density: 1,
+                    angularVelocity: 0,
+                    restitution: 0
+                }
+            },
+            {
+                position: {
+                    x: 16,
+                    y: 92
+                },
+                type: 'static',
+                shape: {
+                    type: 'box',
+                    width: 0.25,
+                    height: 0.25,
+                    rotation: 0.7853981633974483
+                },
+                props: {
+                    density: 1,
+                    angularVelocity: 0,
+                    restitution: 0
+                }
+            },
+            {
+                position: {
+                    x: 19.25,
+                    y: 92
+                },
+                type: 'static',
+                shape: {
+                    type: 'box',
+                    width: 0.25,
+                    height: 0.25,
+                    rotation: 0.7853981633974483
+                },
+                props: {
+                    density: 1,
+                    angularVelocity: 0,
+                    restitution: 0
+                }
+            },
+            {
+                position: {
+                    x: 22.5,
+                    y: 92
+                },
+                type: 'static',
+                shape: {
+                    type: 'box',
+                    width: 0.25,
+                    height: 0.25,
+                    rotation: 0.7853981633974483
+                },
+                props: {
+                    density: 1,
+                    angularVelocity: 0,
+                    restitution: 0
+                }
+            },
+            {
+                position: {
+                    x: 11,
+                    y: 95
+                },
+                type: 'static',
+                shape: {
+                    type: 'box',
+                    width: 0.25,
+                    height: 0.25,
+                    rotation: 0.7853981633974483
+                },
+                props: {
+                    density: 1,
+                    angularVelocity: 0,
+                    restitution: 0
+                }
+            },
+            {
+                position: {
+                    x: 14.25,
+                    y: 95
+                },
+                type: 'static',
+                shape: {
+                    type: 'box',
+                    width: 0.25,
+                    height: 0.25,
+                    rotation: 0.7853981633974483
+                },
+                props: {
+                    density: 1,
+                    angularVelocity: 0,
+                    restitution: 0
+                }
+            },
+            {
+                position: {
+                    x: 17.5,
+                    y: 95
+                },
+                type: 'static',
+                shape: {
+                    type: 'box',
+                    width: 0.25,
+                    height: 0.25,
+                    rotation: 0.7853981633974483
+                },
+                props: {
+                    density: 1,
+                    angularVelocity: 0,
+                    restitution: 0
+                }
+            },
+            {
+                position: {
+                    x: 20.75,
+                    y: 95
+                },
+                type: 'static',
+                shape: {
+                    type: 'box',
+                    width: 0.25,
+                    height: 0.25,
+                    rotation: 0.7853981633974483
+                },
+                props: {
+                    density: 1,
+                    angularVelocity: 0,
+                    restitution: 0
+                }
+            },
+            {
+                position: {
+                    x: 9.5,
+                    y: 98
+                },
+                type: 'static',
+                shape: {
+                    type: 'box',
+                    width: 0.25,
+                    height: 0.25,
+                    rotation: 0.7853981633974483
+                },
+                props: {
+                    density: 1,
+                    angularVelocity: 0,
+                    restitution: 0
+                }
+            },
+            {
+                position: {
+                    x: 12.75,
+                    y: 98
+                },
+                type: 'static',
+                shape: {
+                    type: 'box',
+                    width: 0.25,
+                    height: 0.25,
+                    rotation: 0.7853981633974483
+                },
+                props: {
+                    density: 1,
+                    angularVelocity: 0,
+                    restitution: 0
+                }
+            },
+            {
+                position: {
+                    x: 16,
+                    y: 98
+                },
+                type: 'static',
+                shape: {
+                    type: 'box',
+                    width: 0.25,
+                    height: 0.25,
+                    rotation: 0.7853981633974483
+                },
+                props: {
+                    density: 1,
+                    angularVelocity: 0,
+                    restitution: 0
+                }
+            },
+            {
+                position: {
+                    x: 19.25,
+                    y: 98
+                },
+                type: 'static',
+                shape: {
+                    type: 'box',
+                    width: 0.25,
+                    height: 0.25,
+                    rotation: 0.7853981633974483
+                },
+                props: {
+                    density: 1,
+                    angularVelocity: 0,
+                    restitution: 0
+                }
+            },
+            {
+                position: {
+                    x: 22.5,
+                    y: 98
+                },
+                type: 'static',
+                shape: {
+                    type: 'box',
+                    width: 0.25,
+                    height: 0.25,
+                    rotation: 0.7853981633974483
+                },
+                props: {
+                    density: 1,
+                    angularVelocity: 0,
+                    restitution: 0
+                }
+            },
+            // wheels
+            {
+                position: {
+                    x: 8,
+                    y: 75
+                },
+                type: 'kinematic',
+                shape: {
+                    type: 'box',
+                    width: 2,
+                    height: 0.1,
+                    rotation: 0
+                },
+                props: {
+                    density: 1,
+                    angularVelocity: 3.5,
+                    restitution: 0
+                }
+            },
+            {
+                position: {
+                    x: 12,
+                    y: 75
+                },
+                type: 'kinematic',
+                shape: {
+                    type: 'box',
+                    width: 2,
+                    height: 0.1,
+                    rotation: 0
+                },
+                props: {
+                    density: 1,
+                    angularVelocity: -3.5,
+                    restitution: 0
+                }
+            },
+            {
+                position: {
+                    x: 16,
+                    y: 75
+                },
+                type: 'kinematic',
+                shape: {
+                    type: 'box',
+                    width: 2,
+                    height: 0.1,
+                    rotation: 0
+                },
+                props: {
+                    density: 1,
+                    angularVelocity: 3.5,
+                    restitution: 0
+                }
+            },
+            {
+                position: {
+                    x: 20,
+                    y: 75
+                },
+                type: 'kinematic',
+                shape: {
+                    type: 'box',
+                    width: 2,
+                    height: 0.1,
+                    rotation: 0
+                },
+                props: {
+                    density: 1,
+                    angularVelocity: -3.5,
+                    restitution: 0
+                }
+            },
+            {
+                position: {
+                    x: 24,
+                    y: 75
+                },
+                type: 'kinematic',
+                shape: {
+                    type: 'box',
+                    width: 2,
+                    height: 0.1,
+                    rotation: 0
+                },
+                props: {
+                    density: 1,
+                    angularVelocity: 3.5,
+                    restitution: 0
+                }
+            },
+            {
+                position: {
+                    x: 14,
+                    y: 106.75
+                },
+                type: 'kinematic',
+                shape: {
+                    type: 'box',
+                    width: 2,
+                    height: 0.1,
+                    rotation: 0
+                },
+                props: {
+                    density: 1,
+                    angularVelocity: -1.2,
+                    restitution: 0
+                }
+            }
+        ]
+    },
+    {
+        title: 'Custom Map with Adjusted Start and Finish',
+        goalY: 111,
+        zoomY: 106,
+        walls: [
+            // 왼쪽 벽
+            [
+                [
+                    5,
+                    -300
+                ],
+                [
+                    50,
+                    50
+                ],
+                [
+                    5,
+                    111
+                ]
+            ],
+            // 오른쪽 벽
+            [
+                [
+                    25,
+                    -300
+                ],
+                [
+                    20,
+                    50
+                ],
+                [
+                    25,
+                    111
+                ]
+            ],
+            // 중앙 구조물 (예: 곡선, 꼬인 경로)
+            [
+                [
+                    10,
+                    0
+                ],
+                [
+                    15,
+                    70
+                ],
+                [
+                    18,
+                    90
+                ],
+                [
+                    10,
+                    100
+                ]
+            ],
+            // 추가적인 직선 경로
+            [
+                [
+                    15,
+                    -70
+                ],
+                [
+                    15,
+                    30
+                ],
+                [
+                    15,
+                    100
+                ]
+            ]
+        ],
+        entities: []
     }
 ];
 
@@ -4627,24 +5636,6 @@ class RouletteRenderer {
             marble.render(this.ctx, camera.zoom * (0, _constants.initialZoom), i === winnerIndex, false);
         });
     }
-    // private renderMarbles({
-    //   marbles,
-    //   camera,
-    //   winnerRank,
-    //   winners,
-    // }: RenderParameters) {
-    //   const winnerIndex = winnerRank - winners.length;
-    //   // 상위 500개만 렌더링
-    //   const visibleMarbles = marbles.slice(0, 50);
-    //   visibleMarbles.forEach((marble, i) => {
-    //     marble.render(
-    //       this.ctx,
-    //       camera.zoom * initialZoom,
-    //       i === winnerIndex,
-    //       false,
-    //     );
-    //   });
-    // }
     renderWinner({ winner }) {
         if (!winner) return;
         this.ctx.save();
